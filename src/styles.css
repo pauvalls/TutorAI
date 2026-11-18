@@ -1,0 +1,266 @@
+/* TutorAI — all classes are prefixed. Import: import 'tutor-ai/styles.css' */
+:root {
+  --tutorai-primary: #6d5efc;
+  --tutorai-surface: #ffffff;
+  --tutorai-text: #1f2430;
+  --tutorai-overlay: rgba(15, 18, 30, 0.55);
+  --tutorai-radius: 12px;
+  --tutorai-shadow: 0 18px 50px rgba(15, 18, 30, 0.24);
+}
+
+.tutorai-gate,
+.tutorai-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  font-family: inherit;
+  color: var(--tutorai-text);
+}
+
+.tutorai-overlay {
+  pointer-events: none;
+}
+
+.tutorai-gate {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--tutorai-overlay);
+}
+
+.tutorai-gate-panel,
+.tutorai-card,
+.tutorai-notice {
+  background: var(--tutorai-surface);
+  color: var(--tutorai-text);
+  border-radius: var(--tutorai-radius);
+  box-shadow: var(--tutorai-shadow);
+  box-sizing: border-box;
+}
+
+.tutorai-gate-panel {
+  width: min(440px, 100%);
+  max-height: min(90vh, 720px);
+  overflow: auto;
+  padding: 24px;
+}
+
+.tutorai-gate-title {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.tutorai-gate-subtitle {
+  margin: 0 0 18px;
+  font-size: 0.925rem;
+  opacity: 0.78;
+  line-height: 1.45;
+}
+
+.tutorai-gate-options,
+.tutorai-topic-list {
+  display: grid;
+  gap: 8px;
+}
+
+.tutorai-gate-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.tutorai-gate-option-description,
+.tutorai-topic-button small {
+  font-size: 0.78rem;
+  font-weight: 400;
+  opacity: 0.72;
+}
+
+.tutorai-topics {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid currentColor;
+  border-color: color-mix(in srgb, var(--tutorai-text) 14%, transparent);
+}
+
+.tutorai-topics-title {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+
+.tutorai-topic-filter {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--tutorai-text) 18%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.tutorai-topic-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 9px 11px;
+  border: 1px solid color-mix(in srgb, var(--tutorai-text) 14%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tutorai-topic-button:hover,
+.tutorai-button:hover,
+.tutorai-resume-pill:hover {
+  filter: brightness(1.06);
+}
+
+.tutorai-gate-skip {
+  margin-top: 18px;
+  width: 100%;
+  background: transparent;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--tutorai-text) 18%, transparent);
+}
+
+.tutorai-button {
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--tutorai-text) 16%, transparent);
+  border-radius: 8px;
+  background: var(--tutorai-surface);
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tutorai-primary {
+  border-color: var(--tutorai-primary);
+  background: var(--tutorai-primary);
+  color: #ffffff;
+}
+
+.tutorai-spotlight {
+  position: fixed;
+  box-sizing: border-box;
+  border-radius: 8px;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px var(--tutorai-overlay);
+  transition: top 120ms ease, left 120ms ease, width 120ms ease, height 120ms ease;
+}
+
+.tutorai-card,
+.tutorai-notice {
+  position: fixed;
+  width: min(340px, calc(100vw - 24px));
+  padding: 16px;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.tutorai-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tutorai-card-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.tutorai-icon-button {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tutorai-card-content {
+  margin: 10px 0 16px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.tutorai-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tutorai-progress {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--tutorai-surface);
+  color: var(--tutorai-text);
+  box-shadow: var(--tutorai-shadow);
+  font-size: 0.75rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.tutorai-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.tutorai-notice span {
+  flex: 1;
+}
+
+.tutorai-resume-pill {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9999;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--tutorai-primary);
+  color: #ffffff;
+  box-shadow: var(--tutorai-shadow);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .tutorai-progress {
+    top: 8px;
+    right: 8px;
+  }
+}
