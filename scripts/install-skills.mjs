@@ -8,6 +8,16 @@ const PACKAGE_ROOT = path.resolve(HERE, '..');
 const PACKAGE_NAME = 'tutor-ai';
 const MARKER_FILE = '.tutorai-skills.json';
 const SKILLS_SOURCE = path.join(PACKAGE_ROOT, 'skills');
+const GITIGNORE_FILE = '.gitignore';
+const GITIGNORE_START = '# >>> tutor-ai generated skills >>>';
+const GITIGNORE_END = '# <<< tutor-ai generated skills <<<';
+const GITIGNORE_BASE_ENTRIES = [
+  '.claude/skills/tutor-ai/',
+  '.claude/skills/tutor-ai-authoring/',
+  '.agents/skills/tutor-ai/',
+  '.agents/skills/tutor-ai-authoring/',
+  MARKER_FILE,
+];
 
 function readVersion() {
   try {
@@ -89,6 +99,79 @@ function listShippedSkills() {
 
 function relative(root, target) {
   return path.relative(root, target).split(path.sep).join('/');
+}
+
+/** True when `target` is strictly inside `root` (same directory does not count). */
+function isInsideRoot(root, target) {
+  const rel = path.relative(root, target);
+  return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
+}
+
+function managedGitignoreEntries(root) {
+  const entries = [...GITIGNORE_BASE_ENTRIES];
+  const extra = process.env.TUTOR_AI_SKILLS_DIR;
+  if (extra && extra.trim()) {
+    const dir = path.isAbsolute(extra) ? path.resolve(extra) : path.join(root, extra);
+    if (isInsideRoot(root, dir)) {
+      const prefix = relative(root, dir);
+      for (const skill of listShippedSkills()) {
+        entries.push(`${prefix}/${skill}/`);
+      }
+    }
+  }
+  return Array.from(new Set(entries));
+}
+
+function gitignoreBlock(root) {
+  return [GITIGNORE_START, ...managedGitignoreEntries(root), GITIGNORE_END].join('\n');
+}
+
+/**
+ * Maintains a delimited block in `<root>/.gitignore` so generated skills never
+ * dirty a consumer repository. Best-effort: returns a status, never throws.
+ */
+function syncGitignore(root) {
+  if (process.env.TUTOR_AI_SKIP_GITIGNORE === '1') {
+    return { status: 'skipped (TUTOR_AI_SKIP_GITIGNORE=1)' };
+  }
+  if (!fs.existsSync(path.join(root, '.git'))) {
+    return { status: 'skipped (not a git repository)' };
+  }
+
+  const file = path.join(root, GITIGNORE_FILE);
+  const block = gitignoreBlock(root);
+  let current = '';
+  let exists = true;
+  try {
+    current = fs.readFileSync(file, 'utf8');
+  } catch {
+    exists = false;
+  }
+
+  const startIndex = current.indexOf(GITIGNORE_START);
+  const endIndex =
+    startIndex === -1 ? -1 : current.indexOf(GITIGNORE_END, startIndex);
+  let next;
+
+  if (startIndex !== -1 && endIndex !== -1) {
+    const before = current.slice(0, startIndex);
+    const after = current.slice(endIndex + GITIGNORE_END.length);
+    next = `${before}${block}${after}`;
+    if (next === current) return { status: 'unchanged', file };
+    fs.writeFileSync(file, next);
+    return { status: 'updated', file };
+  }
+
+  if (!current) {
+    next = `${block}\n`;
+  } else if (current.endsWith('\n')) {
+    next = `${current}${block}\n`;
+  } else {
+    next = `${current}\n${block}\n`;
+  }
+  if (exists && next === current) return { status: 'unchanged', file };
+  fs.writeFileSync(file, next);
+  return { status: 'written', file };
 }
 
 function copyDirectory(source, destination, force, root, copied) {
@@ -176,8 +259,24 @@ function main() {
     `[tutor-ai] skipped (already present): ${skipped.length ? skipped.join(', ') : 'none'}`,
   );
   console.log(`[tutor-ai] marker: ${MARKER_FILE}`);
+
+  let gitignoreStatus = 'unknown';
+  try {
+    const result = syncGitignore(root);
+    gitignoreStatus = result.status;
+    console.log(
+      `[tutor-ai] gitignore: ${result.status}${result.file ? ` (${result.file})` : ''}`,
+    );
+  } catch (error) {
+    gitignoreStatus = 'failed (ignored)';
+    console.warn(
+      '[tutor-ai] could not update .gitignore:',
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+
   console.log(
-    '[tutor-ai] disable with TUTOR_AI_SKIP_SKILLS=1; overwrite with TUTOR_AI_SKILLS_FORCE=1',
+    `[tutor-ai] disable with TUTOR_AI_SKIP_SKILLS=1; overwrite with TUTOR_AI_SKILLS_FORCE=1; skip gitignore block with TUTOR_AI_SKIP_GITIGNORE=1 (${gitignoreStatus})`,
   );
 }
 

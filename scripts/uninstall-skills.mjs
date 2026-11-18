@@ -7,6 +7,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ROOT = path.resolve(HERE, '..');
 const PACKAGE_NAME = 'tutor-ai';
 const MARKER_FILE = '.tutorai-skills.json';
+const GITIGNORE_FILE = '.gitignore';
+const GITIGNORE_START = '# >>> tutor-ai generated skills >>>';
+const GITIGNORE_END = '# <<< tutor-ai generated skills <<<';
 
 function stripOwnPackage(input) {
   const parts = path.resolve(input).split(path.sep);
@@ -62,6 +65,41 @@ function allowedPrefixes(root) {
   return prefixes;
 }
 
+/**
+ * Removes the managed block from `<root>/.gitignore`, leaving every other line
+ * untouched. Best-effort: returns a status, never throws.
+ */
+function removeGitignoreBlock(root) {
+  const file = path.join(root, GITIGNORE_FILE);
+  let current;
+  try {
+    current = fs.readFileSync(file, 'utf8');
+  } catch {
+    return { status: 'absent' };
+  }
+  const startIndex = current.indexOf(GITIGNORE_START);
+  const endIndex =
+    startIndex === -1 ? -1 : current.indexOf(GITIGNORE_END, startIndex);
+  if (startIndex === -1 || endIndex === -1) return { status: 'absent' };
+
+  const lines = current.split('\n');
+  const startLine = lines.findIndex((line) => line.trim() === GITIGNORE_START);
+  const endLine = lines.findIndex(
+    (line, index) => index > startLine && line.trim() === GITIGNORE_END,
+  );
+  if (startLine === -1 || endLine === -1) return { status: 'absent' };
+
+  const before = lines.slice(0, startLine);
+  const after = lines.slice(endLine + 1);
+  // Drop the single blank separator the installer may have added before the block.
+  if (after.length === 1 && after[0] === '' && before[before.length - 1] === '') {
+    before.pop();
+  }
+  const next = [...before, ...after].join('\n');
+  fs.writeFileSync(file, next);
+  return { status: 'removed', file };
+}
+
 function main() {
   if (process.env.TUTOR_AI_SKIP_SKILLS === '1') {
     console.log('[tutor-ai] skills removal skipped (TUTOR_AI_SKIP_SKILLS=1)');
@@ -73,12 +111,29 @@ function main() {
     console.log('[tutor-ai] self-install detected; nothing to remove');
     return;
   }
+  let gitignoreStatus = 'absent';
+  try {
+    const result = removeGitignoreBlock(root);
+    gitignoreStatus = result.status;
+    console.log(
+      `[tutor-ai] gitignore block: ${result.status}${result.file ? ` (${result.file})` : ''}`,
+    );
+  } catch (error) {
+    gitignoreStatus = 'failed (ignored)';
+    console.warn(
+      '[tutor-ai] could not update .gitignore:',
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+
   const markerPath = path.join(root, MARKER_FILE);
   let marker;
   try {
     marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
   } catch {
-    console.log('[tutor-ai] no skills marker found; nothing to remove');
+    console.log(
+      `[tutor-ai] no skills marker found; nothing else to remove (gitignore: ${gitignoreStatus})`,
+    );
     return;
   }
 

@@ -15,11 +15,14 @@ Installing `tutor-ai` automatically writes two Agent Skills into the consumer pr
 
 The same skills are copied to `.agents/skills`. An AI assistant in your repo can read them and author tours using your real selectors, context and labels — without you pasting documentation into every prompt. Install is idempotent; existing `SKILL.md` files are never overwritten.
 
+Install also maintains a clearly delimited managed block in your `.gitignore` (only in git repositories), so the generated skills never dirty your working tree. The block is replaced in place, never duplicated, and is skipped when you pass `TUTOR_AI_SKIP_GITIGNORE=1`. `uninstall-skills.mjs` removes the block along with the generated files.
+
 ```bash
 TUTOR_AI_SKIP_SKILLS=1 npm install tutor-ai   # disable
 TUTOR_AI_SKILLS_FORCE=1 npm install tutor-ai  # overwrite
 TUTOR_AI_SKILLS_DIR=docs/skills npm install tutor-ai  # extra destination
-node node_modules/tutor-ai/scripts/uninstall-skills.mjs  # remove generated skills
+TUTOR_AI_SKIP_GITIGNORE=1 npm install tutor-ai  # do not touch .gitignore
+node node_modules/tutor-ai/scripts/uninstall-skills.mjs  # remove generated skills + gitignore block
 ```
 
 ## Install

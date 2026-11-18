@@ -33,6 +33,10 @@ import 'tutor-ai/styles.css';
 Agent Skills are copied to `.claude/skills` and `.agents/skills` on install.
 Set `TUTOR_AI_SKIP_SKILLS=1` to disable, `TUTOR_AI_SKILLS_FORCE=1` to overwrite.
 
+In a git repository the installer also maintains a delimited block in `.gitignore`
+so the generated skills never dirty the consumer repo. Set
+`TUTOR_AI_SKIP_GITIGNORE=1` to skip that block; `uninstall-skills.mjs` removes it.
+
 ## Quickstart
 
 ```tsx

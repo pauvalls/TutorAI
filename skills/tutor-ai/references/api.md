@@ -144,3 +144,17 @@ unfinished tours with a `stepId` enable `TourResumePill` and `resume()`.
 
 `--tutorai-primary`, `--tutorai-surface`, `--tutorai-text`, `--tutorai-overlay`,
 `--tutorai-radius`, `--tutorai-shadow`. All CSS classes start with `tutorai-`.
+
+## Install environment variables
+
+| Variable | Effect |
+| --- | --- |
+| `TUTOR_AI_SKIP_SKILLS=1` | Do not copy Agent Skills at all. |
+| `TUTOR_AI_SKILLS_FORCE=1` | Overwrite existing `SKILL.md` files. |
+| `TUTOR_AI_SKILLS_DIR=<path>` | Extra skills destination, relative to the consumer root. |
+| `TUTOR_AI_SKIP_GITIGNORE=1` | Do not touch the consumer `.gitignore`. |
+
+A successful consumer install also writes a delimited managed block in `.gitignore`
+(only when the root is a git repository) listing the generated skills, the marker file
+and any `TUTOR_AI_SKILLS_DIR` destination inside the root, so generated files never
+dirty the consumer repo. `scripts/uninstall-skills.mjs` removes that block again.
