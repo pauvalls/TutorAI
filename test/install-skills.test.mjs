@@ -10,6 +10,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const INSTALLER = path.join(ROOT, 'scripts', 'install-skills.mjs');
 const UNINSTALLER = path.join(ROOT, 'scripts', 'uninstall-skills.mjs');
+const PKG = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
 
 function tempRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'tutorai-test-'));
@@ -45,7 +46,7 @@ test('copies skills into both default destinations and writes a marker', () => {
   }
   assert.ok(fs.existsSync(path.join(root, '.claude/skills/tutor-ai/references/api.md')));
   const marker = JSON.parse(fs.readFileSync(path.join(root, '.tutorai-skills.json'), 'utf8'));
-  assert.equal(marker.version, '0.1.0');
+  assert.equal(marker.version, PKG.version);
   assert.ok(marker.installed.length >= 4);
   assert.ok(marker.updatedAt);
   assert.match(output, /skills root:/);
