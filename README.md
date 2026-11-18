@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/tutor-ai.png" alt="TutorAI — AI-first guided tours for React" width="100%" />
+  <img src="https://raw.githubusercontent.com/pauvalls/TutorAI/main/assets/tutor-ai.png" alt="TutorAI — AI-first guided tours for React" width="100%" />
 </p>
 
 # TutorAI
