@@ -23,7 +23,8 @@
     "skills",
     "scripts",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "assets"
   ],
   "scripts": {
     "build": "tsup && node scripts/copy-css.mjs",
