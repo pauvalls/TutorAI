@@ -135,6 +135,26 @@ export interface ResumePillRenderProps {
   className?: string;
 }
 
+/** Values handed to a custom coachmark renderer by `TutorialOverlay`. */
+export interface CoachmarkRenderProps {
+  step: TourStep;
+  chapter: TourChapter | null;
+  index: number;
+  total: number;
+  context: TourContext;
+  labels: TourLabels;
+  isHeld: boolean;
+  target: Element | null;
+  hole: { top: number; left: number; width: number; height: number } | null;
+  placement: Placement;
+  cardSize: { width: number; height: number };
+  missing: boolean;
+  next: () => Promise<void>;
+  prev: () => Promise<void>;
+  skip: () => Promise<void>;
+  finish: () => Promise<void>;
+}
+
 export interface TourConfig {
   id: string;
   title?: string;
@@ -143,6 +163,7 @@ export interface TourConfig {
   gate?: GateOption[];
   renderGate?: (props: GateRenderProps) => ReactNode;
   renderResumePill?: (props: ResumePillRenderProps) => ReactNode;
+  renderCoachmark?: (props: CoachmarkRenderProps) => ReactNode;
   topics?: TourTopic[];
   labels?: Partial<TourLabels>;
   context?: ContextInput;

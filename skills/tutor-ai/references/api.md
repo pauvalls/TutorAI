@@ -29,9 +29,32 @@ Stylesheet: `import 'tutor-ai/styles.css'`.
 | `isStepDone` | `(stepId, ctx) => boolean` | — | Config-level done predicate; skipped steps are filtered out. |
 | `renderGate` | `(props: GateRenderProps) => ReactNode` | — | Full custom gate UI. |
 | `renderResumePill` | `(props: ResumePillRenderProps) => ReactNode` | — | Custom resume pill. |
+| `renderCoachmark` | `(props: CoachmarkRenderProps) => ReactNode` | — | Custom coachmark renderer for apps with their own design system or analytics/test hooks. Replaces the overlay card; measurement and navigation still run. |
 
 `GateRenderProps`: `options`, `topics`, `labels`, `tour`, `start`, `startTopic`,
 `skip`, `filterTopics`.
+
+`ResumePillRenderProps`: `labels`, `progress`, `resume`, `className?`.
+
+`CoachmarkRenderProps`: `step`, `chapter`, `index` (0-based), `total`, `context`,
+`labels`, `isHeld`, `target`, `hole`, `placement`, `cardSize`, `missing`, `next`,
+`prev`, `skip`, `finish`. `hole` is `{ top, left, width, height } | null`;
+`cardSize` is `{ width, height }`. All commands return `Promise<void>`.
+
+```tsx
+renderCoachmark: ({ step, index, total, hole, placement, next, prev }) => (
+  <MyCoachmark
+    title={step.title}
+    body={step.content}
+    progress={`${index + 1}/${total}`}
+    rect={hole}
+    placement={placement}
+    data-testid={`coachmark-${step.id}`}
+    onNext={() => void next()}
+    onPrev={() => void prev()}
+  />
+)
+```
 
 ## `TourChapter` / `TourStep`
 

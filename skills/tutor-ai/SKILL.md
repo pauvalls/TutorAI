@@ -92,11 +92,12 @@ Use stable `data-test` attributes as targets. Set labels once for i18n:
 | `TourResumePill` | Floating resume button for unfinished tours. |
 | `holdTour()` / `releaseTour()` / `isTourHeld()` | Module-level pause switch, useful around a payment flow. |
 | `createLocalStorage()` / `noopStorage` | Storage adapters. |
-| `TourConfig`, `TourChapter`, `TourStep`, `TourTopic`, `TourContext`, `TourLabels`, `GateOption`, `TourState`, `TourStorage`, `Placement` | TypeScript types. |
+| `TourConfig`, `TourChapter`, `TourStep`, `TourTopic`, `TourContext`, `TourLabels`, `GateOption`, `TourState`, `TourStorage`, `Placement`, `GateRenderProps`, `ResumePillRenderProps`, `CoachmarkRenderProps` | TypeScript types. |
 
 Key `TourConfig` options: `id`, `title`, `description`, `chapters`, `gate`, `topics`,
 `labels`, `context`, `storage`, `storageKey`, `defaultWaitForTarget`, `showProgress`,
-`showResumePill`, `scrollIntoView`, `isStepDone`, `renderGate`, `renderResumePill`.
+`showResumePill`, `scrollIntoView`, `isStepDone`, `renderGate`, `renderResumePill`,
+`renderCoachmark`.
 
 Key step options: `id`, `title`, `content`, `target`, `targetWhen`, `placement`,
 `padding`, `when`, `isStepDone`, `onEnter`, `onExit`, `waitForTarget`,
@@ -117,6 +118,31 @@ Override CSS custom properties:
   --tutorai-radius: 12px;
   --tutorai-shadow: 0 18px 50px rgba(15, 18, 30, 0.24);
 }
+```
+
+## Coachmark customization
+
+`renderCoachmark` is a custom coachmark renderer for apps with their own design system
+or analytics/test hooks. It receives the current step, chapter, index, total, context,
+labels, held state, measured `target`/`hole`, `placement`, `cardSize`, `missing`, and the
+`next`/`prev`/`skip`/`finish` commands. `TutorialOverlay` keeps measuring the target and
+driving navigation; only the default `tutorai-*` markup is replaced.
+
+```tsx
+const tour: TourConfig = {
+  // ...chapters, etc.
+  renderCoachmark: ({ step, index, total, hole, next, skip }) => (
+    <MyCoachmark
+      title={step.title}
+      body={step.content}
+      progress={`${index + 1}/${total}`}
+      rect={hole}
+      data-testid={`coachmark-${step.id}`}
+      onNext={() => void next()}
+      onSkip={() => void skip()}
+    />
+  ),
+};
 ```
 
 ## Troubleshooting

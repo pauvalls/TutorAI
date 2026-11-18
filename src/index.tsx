@@ -13,6 +13,7 @@ export { createLocalStorage, noopStorage } from './storage';
 
 export { DEFAULT_LABELS } from './types';
 export type {
+  CoachmarkRenderProps,
   ContextInput,
   FlatEntry,
   GateOption,

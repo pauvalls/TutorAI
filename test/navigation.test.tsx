@@ -4,11 +4,13 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   TutorialGate,
+  TutorialOverlay,
   TutorProvider,
   holdTour,
   releaseTour,
   resetHold,
   useTutor,
+  type CoachmarkRenderProps,
   type TutorApi,
   type TourConfig,
   type TourStorage,
@@ -255,6 +257,30 @@ describe('navigation', () => {
       await api.next();
     });
     expect(api.currentStep?.id).toBe('b');
+  });
+
+  it('invokes a custom coachmark renderer with the current step', async () => {
+    function CustomCoachmark(props: CoachmarkRenderProps) {
+      return <div data-testid="custom-coachmark-step">{props.step.id}</div>;
+    }
+    const config = baseConfig({
+      renderCoachmark: (props) => <CustomCoachmark {...props} />,
+    });
+    render(
+      <Harness config={config}>
+        <TutorialOverlay />
+      </Harness>,
+    );
+    await waitFor(() => expect(api.state).toBe('pending'));
+    await act(async () => {
+      await api.start();
+    });
+    expect(api.currentStep?.id).toBe('a');
+    await waitFor(() => {
+      const el = document.body.querySelector('[data-testid="custom-coachmark-step"]');
+      expect(el?.textContent).toBe('a');
+    });
+    expect(screen.queryByTestId('tutor-card')).toBeNull();
   });
 });
 

@@ -92,9 +92,9 @@ Keyboard shortcuts while a tour is running: `ArrowRight`/`Enter` = next, `ArrowL
 | `holdTour()`, `releaseTour()`, `isTourHeld()` | Module-level pause switch (use `hold`/`release` from context inside components). |
 | `createLocalStorage()`, `noopStorage` | Storage adapters. |
 | `DEFAULT_LABELS` | English default strings. |
-| Types | `TourConfig`, `TourChapter`, `TourStep`, `TourTopic`, `TourContext`, `TourLabels`, `GateOption`, `TourState`, `TourStorage`, `Placement`, `TargetResolver`, `TargetWhen`, plus render-props and provider props. |
+| Types | `TourConfig`, `TourChapter`, `TourStep`, `TourTopic`, `TourContext`, `TourLabels`, `GateOption`, `TourState`, `TourStorage`, `Placement`, `TargetResolver`, `TargetWhen`, `CoachmarkRenderProps`, plus other render-props and provider props. |
 
-Key `TourConfig` options: `id`, `title`, `description`, `chapters`, `gate`, `topics`, `labels`, `context`, `storage`, `storageKey`, `defaultWaitForTarget` (1500 ms), `showProgress` (true), `showResumePill` (true), `scrollIntoView` (true), `isStepDone`, `renderGate`, `renderResumePill`.
+Key `TourConfig` options: `id`, `title`, `description`, `chapters`, `gate`, `topics`, `labels`, `context`, `storage`, `storageKey`, `defaultWaitForTarget` (1500 ms), `showProgress` (true), `showResumePill` (true), `scrollIntoView` (true), `isStepDone`, `renderGate`, `renderResumePill`, `renderCoachmark`.
 
 Key `TourStep` options: `id`, `title`, `content`, `target` (selector or resolver), `targetWhen`, `placement`, `padding` (8), `when`, `isStepDone`, `onEnter`, `onExit`, `waitForTarget`, `advanceWhenHidden`, `scrollIntoView`.
 
@@ -154,6 +154,24 @@ renderGate: ({ options, topics, labels, start, startTopic, skip, filterTopics })
 ```
 
 The same pattern applies to `renderResumePill`.
+
+## Coachmark customization
+
+`renderCoachmark` is a custom coachmark renderer for apps with their own design system or analytics/test hooks. `TutorialOverlay` keeps measuring the target, waiting for late selectors and driving navigation; your renderer only supplies the card UI. It receives `step`, `chapter`, `index` (0-based), `total`, `context`, `labels`, `isHeld`, `target`, `hole`, `placement`, `cardSize`, `missing`, and the `next`/`prev`/`skip`/`finish` commands.
+
+```tsx
+renderCoachmark: ({ step, index, total, hole, next, skip }) => (
+  <MyCoachmark
+    title={step.title}
+    body={step.content}
+    progress={`${index + 1}/${total}`}
+    rect={hole}
+    data-testid={`coachmark-${step.id}`}
+    onNext={() => void next()}
+    onSkip={() => void skip()}
+  />
+)
+```
 
 ## i18n
 

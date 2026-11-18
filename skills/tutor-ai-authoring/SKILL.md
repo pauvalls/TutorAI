@@ -114,7 +114,33 @@ consumer uses before they reach `TourConfig`.
 - Test modal steps by mounting/unmounting the selector and waiting for the target.
 - Assert `onEnter`/`onExit` call order with async spies.
 
-## 10. Anti-patterns
+## 10. Custom coachmark renderer
+
+`renderCoachmark` is a custom coachmark renderer for apps with their own design system
+or analytics/test hooks. Use it when the default card markup cannot carry your own
+components, copy or `data-testid` hooks. The library still measures the target and drives
+navigation; you supply only the UI. Props include `step`, `chapter`, `index`, `total`,
+`context`, `labels`, `isHeld`, `target`, `hole`, `placement`, `cardSize`, `missing`, and
+the `next`/`prev`/`skip`/`finish` commands.
+
+```tsx
+renderCoachmark: ({ step, index, total, hole, next, skip }) => (
+  <MyCoachmark
+    title={step.title}
+    body={step.content}
+    progress={`${index + 1}/${total}`}
+    rect={hole}
+    data-testid={`coachmark-${step.id}`}
+    onNext={() => void next()}
+    onSkip={() => void skip()}
+  />
+)
+```
+
+Keep the renderer focused on layout: leave target resolution, `waitForTarget` and
+step advancement to the engine, and call the supplied commands for navigation.
+
+## 11. Anti-patterns
 
 - Copying app routes, roles, or Spanish/English literals into the library — use `labels`.
 - Targeting transient animation wrappers or elements without stable attributes.

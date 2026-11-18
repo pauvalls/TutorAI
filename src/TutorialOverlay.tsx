@@ -31,6 +31,7 @@ export function TutorialOverlay({
   const tutor = useTutor();
   const {
     currentStep,
+    currentChapter,
     currentIndex,
     total,
     isHeld,
@@ -55,6 +56,7 @@ export function TutorialOverlay({
   const advancedRef = useRef(false);
   const lastHoleRef = useRef<Hole | null>(null);
   const stepId = currentStep?.id;
+  const placement = currentStep?.placement ?? 'bottom';
 
   useEffect(() => {
     advancedRef.current = false;
@@ -174,7 +176,6 @@ export function TutorialOverlay({
       };
     }
 
-    const placement = currentStep?.placement ?? 'bottom';
     const centerX = hole.left + hole.width / 2;
     const centerY = hole.top + hole.height / 2;
     let left = 0;
@@ -202,13 +203,37 @@ export function TutorialOverlay({
       left: Math.min(Math.max(margin, left), Math.max(margin, viewportWidth - width - margin)),
       top: Math.min(Math.max(margin, top), Math.max(margin, viewportHeight - height - margin)),
     };
-  }, [hole, cardSize, currentStep?.placement]);
+  }, [hole, cardSize, placement]);
 
   if (typeof document === 'undefined') return null;
   if (state !== 'running' || !currentStep || isHeld) return null;
 
   const progressVisible = showProgress ?? config?.showProgress ?? true;
   const isLast = currentIndex === total - 1;
+
+  if (config?.renderCoachmark) {
+    return createPortal(
+      config.renderCoachmark({
+        step: currentStep,
+        chapter: currentChapter,
+        index: currentIndex,
+        total,
+        context,
+        labels,
+        isHeld,
+        target,
+        hole,
+        placement,
+        cardSize,
+        missing,
+        next: tutor.next,
+        prev: tutor.prev,
+        skip: tutor.skip,
+        finish: tutor.finish,
+      }),
+      document.body,
+    );
+  }
 
   return createPortal(
     <div
