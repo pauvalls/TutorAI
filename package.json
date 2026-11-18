@@ -66,5 +66,13 @@
     "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pauvalls/TutorAI.git"
+  },
+  "homepage": "https://github.com/pauvalls/TutorAI#readme",
+  "bugs": {
+    "url": "https://github.com/pauvalls/TutorAI/issues"
   }
 }

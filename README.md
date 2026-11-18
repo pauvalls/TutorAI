@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/tutor-ai.png" alt="TutorAI — AI-first guided tours for React" width="100%" />
+</p>
+
 # TutorAI
 
 Generic, AI-First guided tours (coachmarks / spotlights) for React 18+ — data-driven, zero app copy, and Agent Skills generated in your project on install.
